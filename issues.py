@@ -53,8 +53,8 @@ def change_assignee(issue_id, assignee_id=None, group_id=None):
             print(f"[ OK ] Заявка #{issue_id}: ответственный снят")
 
 
-def change_issue_status(issue_id, code, **kwargs):
-    payload = {'code': str(code)}
+def change_issue_status(issue_id, status_code, **kwargs):
+    payload = {'code': str(status_code)}
     payload.update(kwargs)
     r = requests.post(f'{api_uri}/issues/{issue_id}/statuses', json=payload, params=token)
     if not r.status_code == 200:

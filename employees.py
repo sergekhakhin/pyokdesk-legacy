@@ -12,3 +12,10 @@ def get_employee_id(ref):
         return employee_dict[ref]
     except KeyError:
         print("[ ERROR ] Не удалось найти сотрудника")
+
+
+def get_employee_ref(employee_id):
+    try:
+        return [k for k, v in employee_dict.items() if v == employee_id]
+    except KeyError:
+        print("[ ERROR ] Не удалось найти сотрудника по ID")
