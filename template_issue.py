@@ -26,7 +26,7 @@ while True:
 
 comment = input("[ INPUT ] Комментарий: ")
 if not comment:
-    print('[ INFO ]Комментарий не будет добавлен')
+    print('[ INFO ] Комментарий не будет добавлен')
 
 services = []
 while True:
