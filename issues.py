@@ -90,3 +90,20 @@ def add_service(issue_id, code, quantity=1, performer_id=None):
         print("[ ERROR ] " + str(json.loads(r.text)['errors']))
     else:
         print(f'[ OK ] Заявка #{issue_id}: добавлена спецификация')
+
+
+def get_opened_issues():
+    payload = {
+        'status[]': 'opened'
+    }
+    payload.update(token)
+    r = requests.get(f'{api_uri}/issues/count', params=payload)
+    return json.loads(r.text)
+
+
+def get_issue_comments(issue_id):
+    payload = {
+        'issue_id': int(issue_id)
+    }
+    r = requests.get(f'{api_uri}/issues/{issue_id}/comments', json=payload, params=token)
+    return json.loads(r.text)
