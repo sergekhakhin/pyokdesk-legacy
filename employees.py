@@ -1,3 +1,5 @@
+import random
+
 employee_dict = {
     'kis': 1,
     'mon': 3,
@@ -12,6 +14,12 @@ def get_employee_id(ref):
         return employee_dict[ref]
     except KeyError:
         print("[ ERROR ] Не удалось найти сотрудника")
+
+
+def get_random_employee_id():
+    id_list = list(employee_dict.values())
+    id_list.remove(1)
+    return random.choice(id_list)
 
 
 def get_employee_ref(employee_id):
