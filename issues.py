@@ -30,7 +30,7 @@ def create_issue(title, **kwargs):
     payload.update(kwargs)
     r = requests.post(f'{api_uri}/issues', json=payload, params=token)
     if not r.status_code == 200:
-        print("[ ERROR  ] " + str(json.loads(r.text)['errors']))
+        print("[ ERROR ] " + str(json.loads(r.text)['errors']))
     else:
         issue_id = json.loads(r.text)['id']
         print(f"[ OK ] Заявка #{issue_id} создана")
