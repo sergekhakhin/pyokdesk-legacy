@@ -5,22 +5,35 @@ import requests
 from main import api_uri
 from main import token
 
-create_issue_params = {
-    'description': str(),
-    'company_id': str(),
-    'contact_id': str(),
-    'agreement_id': str(),
-    'assignee_id': str(),
-    'group_id': str(),
-    'maintenance_entity_id': str(),
-    'equipment_ids': list(),
-    'type': str(),
-    'priority': str(),
-    'deadline_at': str(),
-    'custom_parameters': dict(),
-    'parent_id': str(),
-    'author': dict()
-}
+
+def get_issue_info(issue_id):
+    payload = {'issued_id': int(issue_id)}
+    r = requests.get(f'{api_uri}/issues/{issue_id}', json=payload, params=token)
+    if not r.status_code == 200:
+        print("[ ERROR ] " + str(json.loads(r.text)['errors']))
+    else:
+        return json.loads(r.text)
+
+
+def get_opened_issues():
+    payload = {'status[]': 'opened'}
+    payload.update(token)
+    r = requests.get(f'{api_uri}/issues/count', params=payload)
+    if not r.status_code == 200:
+        print("[ ERROR ] " + str(json.loads(r.text)['errors']))
+    else:
+        return json.loads(r.text)
+
+
+def get_issue_comments(issue_id):
+    payload = {
+        'issue_id': int(issue_id)
+    }
+    r = requests.get(f'{api_uri}/issues/{issue_id}/comments', json=payload, params=token)
+    if not r.status_code == 200:
+        print("[ ERROR ] " + str(json.loads(r.text)['errors']))
+    else:
+        return json.loads(r.text)
 
 
 def create_issue(title, **kwargs):
@@ -37,11 +50,8 @@ def create_issue(title, **kwargs):
         return issue_id
 
 
-def change_assignee(issue_id, assignee_id=None, group_id=None):
-    payload = {
-        'assignee_id': str(assignee_id),
-        'group_id': str(group_id)
-    }
+def change_assignee(issue_id, assignee_id):
+    payload = {'assignee_id': str(assignee_id)}
     r = requests.patch(f'{api_uri}/issues/{issue_id}/assignees', json=payload, params=token)
     if not r.status_code == 200:
         print("[ ERROR ] " + str(json.loads(r.text)['errors']))
@@ -90,20 +100,3 @@ def add_service(issue_id, code, quantity=1, performer_id=None):
         print("[ ERROR ] " + str(json.loads(r.text)['errors']))
     else:
         print(f'[ OK ] Заявка #{issue_id}: добавлена спецификация')
-
-
-def get_opened_issues():
-    payload = {
-        'status[]': 'opened'
-    }
-    payload.update(token)
-    r = requests.get(f'{api_uri}/issues/count', params=payload)
-    return json.loads(r.text)
-
-
-def get_issue_comments(issue_id):
-    payload = {
-        'issue_id': int(issue_id)
-    }
-    r = requests.get(f'{api_uri}/issues/{issue_id}/comments', json=payload, params=token)
-    return json.loads(r.text)
