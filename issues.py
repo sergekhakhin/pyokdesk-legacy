@@ -45,9 +45,7 @@ def create_issue(title, **kwargs):
     if not r.status_code == 200:
         print("[ ERROR ] " + str(json.loads(r.text)['errors']))
     else:
-        issue_id = json.loads(r.text)['id']
-        print(f"[ OK ] Заявка #{issue_id} создана")
-        return issue_id
+        return json.loads(r.text)
 
 
 def change_assignee(issue_id, assignee_id):
