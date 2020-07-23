@@ -107,7 +107,7 @@ for i in range(start_number, quantity + start_number):
         }
     }
     issue_id = create_issue(title, **payload)
-    created_issues.append(issue_id)
+    created_issues.append(issue_id['id'])
 
 if comment:
     for issue_id in created_issues:
