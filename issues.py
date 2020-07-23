@@ -2,8 +2,8 @@ import json
 
 import requests
 
-from main import api_uri
-from main import token
+from settings import api_uri
+from settings import token
 
 
 def get_issue_info(issue_id):
