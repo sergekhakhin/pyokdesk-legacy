@@ -22,6 +22,5 @@ def get_company_name(company_id):
     try:
         company_name = json.loads(r.text)['name']
         return company_name
-        print(r.text)
     except(KeyError, IndexError):
         print(f"[ ERROR ] Не удалось определить название компании")
