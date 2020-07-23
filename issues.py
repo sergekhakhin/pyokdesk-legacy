@@ -56,11 +56,8 @@ def change_assignee(issue_id, assignee_id):
     if not r.status_code == 200:
         print("[ ERROR ] " + str(json.loads(r.text)['errors']))
     else:
-        try:
-            assignee_name = json.loads(r.text)['assignee']['name']
-            print(f"[ OK ] Заявка #{issue_id}: назначен ответственный: {assignee_name}")
-        except TypeError:
-            print(f"[ OK ] Заявка #{issue_id}: ответственный снят")
+        assignee_name = json.loads(r.text)['assignee']['name']
+        print(f"[ OK ] Заявка #{issue_id}: назначен ответственный: {assignee_name}")
 
 
 def change_issue_status(issue_id, status_code, **kwargs):
