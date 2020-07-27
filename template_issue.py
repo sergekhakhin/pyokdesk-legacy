@@ -1,6 +1,6 @@
-from companies import get_company_id, get_company_name
-from employees import get_employee_id, get_employee_ref
-from issues import create_issue, leave_comment, add_service, change_issue_status
+from lib.companies import get_company_id, get_company_name
+from lib.employees import get_employee_id, get_employee_ref
+from lib.issues import create_issue, leave_comment, add_service, change_issue_status
 
 while True:
     template_title = str(input("[ INPUT ] Название заявки: "))

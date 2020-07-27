@@ -1,5 +1,5 @@
-from employees import *
-from issues import *
+from lib.employees import *
+from lib.issues import *
 
 for issue_id in get_opened_issues():
     if get_issue_info(issue_id)['title'] == "Профилактический выезд":

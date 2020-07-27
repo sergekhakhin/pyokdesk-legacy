@@ -2,8 +2,8 @@ import json
 
 import requests
 
-from settings import api_uri
-from settings import token
+from lib.settings import api_uri
+from lib.settings import token
 
 
 def get_company_id(search_string):
