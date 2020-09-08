@@ -44,6 +44,9 @@ while True:
 if not services:
     print("[ INFO ] Спецификация не будет добавлена")
 
+start_number = 0
+end_number = 0
+quantity = 0
 while True:
     try:
         start_number = int(input("[ INPUT ] Начало нумерации: "))
@@ -54,15 +57,14 @@ while True:
         print("[ ERROR ] Некорректный ввод!")
         continue
 
+should_complete_issues = True
 while True:
     user_input = str(input("[ INPUT ] Сменить статус на «Решено»? (Y/n): "))
     if not user_input:
-        should_complete_issues = True
         break
     else:
         user_input = user_input.lower().strip()[0]
     if user_input == 'y':
-        should_complete_issues = True
         break
     elif user_input == 'n':
         should_complete_issues = False
