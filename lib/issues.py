@@ -6,13 +6,22 @@ from lib.settings import api_uri
 from lib.settings import token
 
 
-def get_issue_info(issue_id):
-    payload = {'issued_id': int(issue_id)}
-    r = requests.get(f'{api_uri}/issues/{issue_id}', json=payload, params=token)
-    if not r.status_code == 200:
-        print("[ ERROR ] " + str(json.loads(r.text)['errors']))
+class Error(Exception):
+    pass
+
+
+class IssueNotFoundError(Error):
+    pass
+
+
+def get_issue_info(issue_id: int) -> dict:
+    r = requests.get(f'{api_uri}/issues/{issue_id}', params=token)
+    r.raise_for_status()
+    decoded_r = json.loads(r.text)
+    if 'errors' in decoded_r:
+        raise IssueNotFoundError
     else:
-        return json.loads(r.text)
+        return decoded_r
 
 
 def get_opened_issues():
