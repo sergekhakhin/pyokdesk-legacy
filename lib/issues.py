@@ -15,45 +15,50 @@ class IssueNotFoundError(Error):
 
 
 def get_issue_info(issue_id: int) -> dict:
+    issue_id = int(issue_id)
     r = requests.get(f'{api_uri}/issues/{issue_id}', params=token)
-    r.raise_for_status()
-    decoded_r = json.loads(r.text)
-    if 'errors' in decoded_r:
-        raise IssueNotFoundError
+    if r.status_code == 200:
+        decoded_r = json.loads(r.text)
+        if 'errors' not in decoded_r:
+            return decoded_r
+        else:
+            raise IssueNotFoundError
     else:
-        return decoded_r
+        r.raise_for_status()
 
 
-def get_opened_issues() -> list:
-    payload = {'status[]': 'opened'}
+def get_issues_list_by_status(status: str) -> list:
+    payload = {'status[]': str(status)}
     payload.update(token)
     r = requests.get(f'{api_uri}/issues/count', params=payload)
-    r.raise_for_status()
-    decoded_r = json.loads(r.text)
-    return decoded_r
-
-
-def get_issue_comments(issue_id):
-    payload = {
-        'issue_id': int(issue_id)
-    }
-    r = requests.get(f'{api_uri}/issues/{issue_id}/comments', json=payload, params=token)
-    if not r.status_code == 200:
-        print("[ ERROR ] " + str(json.loads(r.text)['errors']))
+    if r.status_code == 200:
+        decoded_r = json.loads(r.text)
+        return decoded_r
     else:
-        return json.loads(r.text)
+        r.raise_for_status()
 
 
-def create_issue(title, **kwargs):
-    payload = {
-        'title': str(title)
-    }
+def get_issue_comments(issue_id: int) -> list:
+    payload = {'issue_id': int(issue_id)}
+    r = requests.get(f'{api_uri}/issues/{issue_id}/comments', json=payload, params=token)
+    if r.status_code == 200:
+        decoded_r = json.loads(r.text)
+        return decoded_r
+    elif r.status_code == 404:
+        raise IssueNotFoundError
+    else:
+        r.raise_for_status()
+
+
+def create_issue(title: str, **kwargs) -> int:
+    payload = {'title': str(title)}
     payload.update(kwargs)
     r = requests.post(f'{api_uri}/issues', json=payload, params=token)
-    if not r.status_code == 200:
-        print("[ ERROR ] " + str(json.loads(r.text)['errors']))
+    if r.status_code == 200:
+        issue_id = json.loads(r.text)['id']
+        return issue_id
     else:
-        return json.loads(r.text)
+        r.raise_for_status()
 
 
 def change_assignee(issue_id, assignee_id):
