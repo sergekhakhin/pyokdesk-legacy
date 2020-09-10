@@ -24,14 +24,13 @@ def get_issue_info(issue_id: int) -> dict:
         return decoded_r
 
 
-def get_opened_issues():
+def get_opened_issues() -> list:
     payload = {'status[]': 'opened'}
     payload.update(token)
     r = requests.get(f'{api_uri}/issues/count', params=payload)
-    if not r.status_code == 200:
-        print("[ ERROR ] " + str(json.loads(r.text)['errors']))
-    else:
-        return json.loads(r.text)
+    r.raise_for_status()
+    decoded_r = json.loads(r.text)
+    return decoded_r
 
 
 def get_issue_comments(issue_id):
