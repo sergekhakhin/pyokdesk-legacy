@@ -29,7 +29,7 @@ def get_issue_comments(issue_id: int):
             return comment_list
         else:
             print(f"[ ERROR ] {decoded_r['errors']}")
-    except:
+    except json.decoder.JSONDecodeError:
         r.raise_for_status()
 
 
