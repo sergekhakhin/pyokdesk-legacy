@@ -8,14 +8,14 @@ employee_dict = {
 }
 
 
-def get_employee_id_by_ref(ref):
+def get_employee_id_by_ref(ref: str):
     try:
         return employee_dict[ref]
     except KeyError:
         print("[ ERROR ] Не удалось найти сотрудника")
 
 
-def get_employee_ref_by_id(employee_id):
+def get_employee_ref_by_id(employee_id: int):
     try:
         return [k for k, v in employee_dict.items() if v == employee_id]
     except KeyError:
