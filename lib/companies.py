@@ -6,7 +6,7 @@ from lib.settings import api_uri
 from lib.settings import token
 
 
-def get_company_info_by_id(company_id):
+def get_company_info_by_id(company_id: int):
     payload = {'id': company_id}
     r = requests.get(f'{api_uri}/companies', json=payload, params=token)
     try:
