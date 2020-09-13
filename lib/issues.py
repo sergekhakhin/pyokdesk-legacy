@@ -6,47 +6,32 @@ from lib.settings import api_uri
 from lib.settings import token
 
 
-class Error(Exception):
-    pass
-
-
-class IssueNotFoundError(Error):
-    pass
-
-
 def get_issue_info(issue_id: int) -> dict:
     issue_id = int(issue_id)
     r = requests.get(f'{api_uri}/issues/{issue_id}', params=token)
-    if r.status_code == 200:
+    try:
         decoded_r = json.loads(r.text)
         if 'errors' not in decoded_r:
-            return decoded_r
+            issue_info_dict = decoded_r
+            return issue_info_dict
         else:
-            raise IssueNotFoundError
-    else:
+            print(f"[ ERROR ] {decoded_r['errors']}")
+    except json.decoder.JSONDecodeError:
         r.raise_for_status()
 
 
-def get_issues_list_by_status(status: str) -> list:
+def get_issue_list_by_status(status: str) -> list:
     payload = {'status[]': str(status)}
     payload.update(token)
     r = requests.get(f'{api_uri}/issues/count', params=payload)
-    if r.status_code == 200:
+    try:
         decoded_r = json.loads(r.text)
-        return decoded_r
-    else:
-        r.raise_for_status()
-
-
-def get_issue_comments(issue_id: int) -> list:
-    payload = {'issue_id': int(issue_id)}
-    r = requests.get(f'{api_uri}/issues/{issue_id}/comments', json=payload, params=token)
-    if r.status_code == 200:
-        decoded_r = json.loads(r.text)
-        return decoded_r
-    elif r.status_code == 404:
-        raise IssueNotFoundError
-    else:
+        if 'errors' not in decoded_r:
+            issue_list = decoded_r
+            return issue_list
+        else:
+            print(f"[ ERROR ] {decoded_r['errors']}")
+    except json.decoder.JSONDecodeError:
         r.raise_for_status()
 
 
@@ -54,57 +39,87 @@ def create_issue(title: str, **kwargs) -> int:
     payload = {'title': str(title)}
     payload.update(kwargs)
     r = requests.post(f'{api_uri}/issues', json=payload, params=token)
-    if r.status_code == 200:
-        issue_id = json.loads(r.text)['id']
-        return issue_id
-    else:
+    try:
+        decoded_r = json.loads(r.text)
+        if 'errors' not in decoded_r:
+            issue_id = decoded_r['id']
+            print(f"[ OK ] Заявка #{issue_id} создана")
+            return issue_id
+        else:
+            print(f"[ ERROR ] {decoded_r['errors']}")
+    except json.decoder.JSONDecodeError:
         r.raise_for_status()
 
 
-def change_assignee(issue_id, assignee_id):
-    payload = {'assignee_id': str(assignee_id)}
+def change_assignee(issue_id: int, assignee_id=None, group_id=None):
+    payload = {
+        'assignee_id': assignee_id,
+        'group_id': group_id
+    }
     r = requests.patch(f'{api_uri}/issues/{issue_id}/assignees', json=payload, params=token)
-    if not r.status_code == 200:
-        print("[ ERROR ] " + str(json.loads(r.text)['errors']))
-    else:
-        assignee_name = json.loads(r.text)['assignee']['name']
-        print(f"[ OK ] Заявка #{issue_id}: назначен ответственный: {assignee_name}")
+    try:
+        decoded_r = json.loads(r.text)
+        if 'errors' not in decoded_r:
+            if not decoded_r['assignee']:
+                print(f"[ OK ] Заявка #{issue_id}: снят ответственный")
+            else:
+                assignee_name = decoded_r['assignee']['name']
+                print(f"[ OK ] Заявка #{issue_id}: назначен ответственный -> {assignee_name}")
+        else:
+            print(f"[ ERROR ] {decoded_r['errors']}")
+    except json.decoder.JSONDecodeError:
+        r.raise_for_status()
 
 
-def change_issue_status(issue_id, status_code, **kwargs):
-    payload = {'code': str(status_code)}
+def change_issue_status(issue_id: int, status_code: str, **kwargs):
+    payload = {'code': status_code}
     payload.update(kwargs)
     r = requests.post(f'{api_uri}/issues/{issue_id}/statuses', json=payload, params=token)
-    if not r.status_code == 200:
-        print("[ ERROR ] " + str(json.loads(r.text)['errors']))
-    else:
-        issue_status = json.loads(r.text)['status']['name']
-        print(f'[ OK ] Заявка #{issue_id}: статус изменён на «{issue_status}»')
+    try:
+        decoded_r = json.loads(r.text)
+        if 'errors' not in decoded_r:
+            issue_status = decoded_r['status']['name']
+            print(f"[ OK ] Заявка #{issue_id}: статус изменён на «{issue_status}»")
+        else:
+            print(f"[ ERROR ] {decoded_r['errors']}")
+    except json.decoder.JSONDecodeError:
+        r.raise_for_status()
 
 
-def leave_comment(issue_id, comment, author_id, public=True):
+def add_comment(issue_id: int, comment: str, author_id: int, public=False):
     payload = {
-        'content': str(comment),
-        'author_id': int(author_id),
-        'public': bool(public)
+        'content': comment,
+        'author_id': author_id,
+        'public': public
     }
     r = requests.post(f'{api_uri}/issues/{issue_id}/comments', json=payload, params=token)
-    if not r.status_code == 200:
-        print("[ ERROR ] " + str(json.loads(r.text)['errors']))
-    else:
-        print(f'[ OK ] Заявка #{issue_id}: добавлен комментарий')
+    try:
+        decoded_r = json.loads(r.text)
+        if 'errors' not in decoded_r:
+            print(f"[ OK ] Заявка #{issue_id}: добавлен комментарий")
+        else:
+            print(f"[ ERROR ] {decoded_r['errors']}")
+    except json.decoder.JSONDecodeError:
+        r.raise_for_status()
 
 
-def add_service(issue_id, code, quantity=1, performer_id=None):
+def add_service(issue_id: int, code: str, quantity: float, performer_id=None, **kwargs):
     payload = {
         'issue_service': {
             'code': str(code),
-            'quantity': float(quantity),
-            'performer_id': int(performer_id)
+            'quantity': quantity,
+            'performer_id': performer_id
         }
     }
+    payload.update(kwargs)
+    if not performer_id:  # Remove 'performer_id' if not passed.
+        payload['issue_service'].pop('performer_id', None)
     r = requests.post(f'{api_uri}/issues/{issue_id}/services', json=payload, params=token)
-    if not r.status_code == 200:
-        print("[ ERROR ] " + str(json.loads(r.text)['errors']))
-    else:
-        print(f'[ OK ] Заявка #{issue_id}: добавлена спецификация')
+    try:
+        decoded_r = json.loads(r.text)
+        if 'errors' not in decoded_r:
+            print(f"[ OK ] Заявка #{issue_id}: добавлена спецификация")
+        else:
+            print(f"[ ERROR ] {decoded_r['errors']}")
+    except json.decoder.JSONDecodeError:
+        r.raise_for_status()
