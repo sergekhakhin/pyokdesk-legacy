@@ -7,7 +7,6 @@ from lib.settings import token
 
 
 def get_issue_info(issue_id: int) -> dict:
-    issue_id = int(issue_id)
     r = requests.get(f'{api_uri}/issues/{issue_id}', params=token)
     try:
         decoded_r = json.loads(r.text)
@@ -21,7 +20,7 @@ def get_issue_info(issue_id: int) -> dict:
 
 
 def get_issue_list_by_status(status: str) -> list:
-    payload = {'status[]': str(status)}
+    payload = {'status[]': status}
     payload.update(token)
     r = requests.get(f'{api_uri}/issues/count', params=payload)
     try:
@@ -36,7 +35,7 @@ def get_issue_list_by_status(status: str) -> list:
 
 
 def create_issue(title: str, **kwargs) -> int:
-    payload = {'title': str(title)}
+    payload = {'title': title}
     payload.update(kwargs)
     r = requests.post(f'{api_uri}/issues', json=payload, params=token)
     try:
