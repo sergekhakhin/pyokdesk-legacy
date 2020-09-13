@@ -1,5 +1,5 @@
-from lib.issues import get_opened_issues, get_issue_comments, leave_comment
+from lib.issues import get_issue_list_by_status, get_issue_comments, add_comment
 
-for issue_id in get_opened_issues():
+for issue_id in get_issue_list_by_status('opened'):
     if not get_issue_comments(issue_id):
-        leave_comment(issue_id, 'В работе.', author_id=6)
+        add_comment(issue_id, 'В работе.', author_id=6, public=True)

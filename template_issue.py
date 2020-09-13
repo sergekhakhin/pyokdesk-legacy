@@ -1,6 +1,6 @@
-from lib.companies import get_company_id, get_company_name
-from lib.employees import get_employee_id, get_employee_ref
-from lib.issues import create_issue, leave_comment, add_service, change_issue_status
+from lib.companies import find_company_id, get_company_info_by_id
+from lib.employees import get_employee_id_by_ref
+from lib.issues import create_issue, add_comment, add_service, change_issue_status
 
 while True:
     template_title = str(input("[ INPUT ] Название заявки: "))
@@ -11,14 +11,15 @@ while True:
         break
 
 while True:
-    company_id = get_company_id(input("[ INPUT ] Организация: "))
+    company_id = find_company_id(input("[ INPUT ] Организация: "))
     if not company_id:
         continue
     else:
         break
 
 while True:
-    employee_id = get_employee_id(input("[ INPUT ] Сотрудник: "))
+    employee_ref = input("[ INPUT ] Сотрудник: ")
+    employee_id = get_employee_id_by_ref(employee_ref)
     if not employee_id:
         continue
     else:
@@ -74,8 +75,8 @@ while True:
 
 input_params = f'''
 [ INFO ] Название: {template_title}
-[ INFO ] Организация: {get_company_name(company_id)}
-[ INFO ] Сотрудник: {get_employee_ref(employee_id)}
+[ INFO ] Организация: {get_company_info_by_id(company_id)['name']}
+[ INFO ] Сотрудник: {employee_ref}
 [ INFO ] Комментарий: {comment}
 [ INFO ] Спецификации: {services}
 [ INFO ] Начало нумерации: {start_number} 
@@ -109,11 +110,11 @@ for i in range(start_number, quantity + start_number):
         }
     }
     issue_id = create_issue(title, **payload)
-    created_issues.append(issue_id['id'])
+    created_issues.append(issue_id)
 
 if comment:
     for issue_id in created_issues:
-        leave_comment(issue_id, comment, employee_id)
+        add_comment(issue_id, comment, employee_id, public=True)
 
 if services:
     for issue_id in created_issues:
