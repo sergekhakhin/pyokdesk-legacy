@@ -19,6 +19,20 @@ def get_issue_info(issue_id: int) -> dict:
         r.raise_for_status()
 
 
+def get_issue_comments(issue_id: int):
+    payload = {'issue_id': issue_id}
+    r = requests.get(f'{api_uri}/issues/{issue_id}/comments', json=payload, params=token)
+    try:
+        decoded_r = json.loads(r.text)
+        if 'errors' not in decoded_r:
+            comment_list = decoded_r
+            return comment_list
+        else:
+            print(f"[ ERROR ] {decoded_r['errors']}")
+    except:
+        r.raise_for_status()
+
+
 def get_issue_list_by_status(status: str) -> list:
     payload = {'status[]': status}
     payload.update(token)
