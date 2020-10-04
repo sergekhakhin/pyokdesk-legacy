@@ -33,7 +33,7 @@ def get_issue_comments(issue_id: int):
         r.raise_for_status()
 
 
-def get_issue_list_by_status(status: str) -> list:
+def get_issue_list_by_status(status) -> list:
     payload = {'status[]': status}
     payload.update(token)
     r = requests.get(f'{api_uri}/issues/count', params=payload)
@@ -42,6 +42,19 @@ def get_issue_list_by_status(status: str) -> list:
         if 'errors' not in decoded_r:
             issue_list = decoded_r
             return issue_list
+        else:
+            print(f"[ ERROR ] {decoded_r['errors']}")
+    except json.decoder.JSONDecodeError:
+        r.raise_for_status()
+
+
+def get_issue_services(issue_id: int) -> list:
+    r = requests.get(f'{api_uri}/issues/{issue_id}/services', params=token)
+    try:
+        decoded_r = json.loads(r.text)
+        if 'errors' not in decoded_r:
+            services = decoded_r
+            return services
         else:
             print(f"[ ERROR ] {decoded_r['errors']}")
     except json.decoder.JSONDecodeError:
@@ -136,3 +149,8 @@ def add_service(issue_id: int, code: str, quantity: float, performer_id=None, **
             print(f"[ ERROR ] {decoded_r['errors']}")
     except json.decoder.JSONDecodeError:
         r.raise_for_status()
+
+
+def add_services(issue_id: int, performer_id=None, **services):
+    for service in services.items():
+        add_service(issue_id, service[0], service[1], performer_id)
