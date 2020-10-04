@@ -2,8 +2,7 @@ import json
 
 import requests
 
-from lib.settings import api_uri
-from lib.settings import token
+from lib.settings import api_uri, token
 
 
 def get_company_info_by_id(company_id: int):
