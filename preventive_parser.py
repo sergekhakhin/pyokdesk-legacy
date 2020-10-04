@@ -1,11 +1,15 @@
+from lib.classes import Issue
 from lib.employees import get_random_employee_id
 from lib.issues import *
 
-for issue_id in get_issue_list_by_status('opened'):
-    if get_issue_info(issue_id)['title'] == "Профилактический выезд":
+comment = "В работе."
+preventive_service = '5116'
+
+for issue in [Issue(issue_id) for issue_id in get_issue_list_by_status('opened')]:
+    if issue.title == "Профилактический выезд":
         employee_id = get_random_employee_id()
-        if not get_issue_comments(issue_id):
-            add_comment(issue_id, 'В работе.', employee_id, public=True)
-        change_assignee(issue_id, employee_id)
-        add_service(issue_id, '5116', 1, performer_id=employee_id)
-        change_issue_status(issue_id, 'completed')
+        if not issue.comments['count']:
+            issue.add_comment(comment, employee_id, public=True)
+        issue.change_assignee(assignee_id=employee_id)
+        issue.add_service(preventive_service, 1, performer_id=employee_id)
+        issue.complete()
