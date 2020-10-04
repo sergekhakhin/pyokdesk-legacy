@@ -1,4 +1,4 @@
-import random
+from random import choice
 
 employee_dict = {
     'kis': 1,
@@ -25,4 +25,4 @@ def get_employee_ref_by_id(employee_id: int):
 def get_random_employee_id():
     id_list = list(employee_dict.values())
     id_list.remove(1)
-    return random.choice(id_list)
+    return choice(id_list)
