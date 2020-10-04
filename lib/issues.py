@@ -2,7 +2,7 @@ import json
 
 import requests
 
-from lib.settings import api_uri, token
+from settings import api_uri, token
 
 
 def get_issue_info(issue_id: int) -> dict:
